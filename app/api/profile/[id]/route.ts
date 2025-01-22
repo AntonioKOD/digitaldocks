@@ -3,13 +3,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-interface Context {
-  params: {
-    id: string;
-  };
-}
-
-export async function GET(req: Request, { params }: Context) {
+export async function GET(req: Request, { params }: { params: { id: string } } ) {
     const { id } = params; // Correct way to access params
 
     try {
@@ -22,7 +16,8 @@ export async function GET(req: Request, { params }: Context) {
         }
 
         return NextResponse.json({ user });
-    } catch {
+    } catch (error) {
+        console.error(error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
