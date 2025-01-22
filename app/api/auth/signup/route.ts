@@ -30,6 +30,6 @@ export async function POST(req: Request){
         });
         return NextResponse.json({user})
     }else{
-        return new NextResponse(null, { status: 405 });
+        return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
     }
 }
