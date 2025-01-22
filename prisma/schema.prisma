@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String?
+  password  String?
+  role      Role      @default(USER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  products  Product[]
+  orders    Order[]
+  reviews   Review[]
+}
+
+model Product {
+  id           String   @id @default(cuid())
+  title        String
+  description  String
+  price        Decimal  @db.Decimal(10, 2)
+  fileUrl      String
+  previewImage String
+  category     String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sellerId String
+  seller   User     @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  orders   Order[]
+  reviews  Review[]
+}
+
+model Order {
+  id         String   @id @default(cuid())
+  buyerId    String
+  buyer      User     @relation(fields: [buyerId], references: [id])
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id])
+  totalPrice Decimal  @db.Decimal(10, 2)
+  createdAt  DateTime @default(now())
+
+  downloadUrl String?
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int
+  comment   String
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+enum Role {
+  USER
+  SELLER
+}
