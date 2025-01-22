@@ -2,9 +2,17 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function GET(req: Request, context: Promise<{ params: { id: string } }>) {
-    const { params } = await context;
-    const { id } = params;
+export async function GET(req: Request) {
+    // Extract the 'id' from the request URL
+    const url = new URL(req.url);
+    const id = url.pathname.split("/").pop();
+
+    if (!id) {
+        return new Response(
+            JSON.stringify({ error: "ID parameter is missing" }),
+            { status: 400 }
+        );
+    }
 
     try {
         const user = await prisma.user.findUnique({
